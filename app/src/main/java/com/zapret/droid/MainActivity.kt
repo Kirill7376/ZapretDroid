@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var logAdapter: LogAdapter
 
     private lateinit var btnToggle: MaterialButton
+    private lateinit var btnTelegramConnect: MaterialButton
     private lateinit var tvStatus: TextView
     private lateinit var switchTelegram: SwitchMaterial
     private lateinit var switchAutostart: SwitchMaterial
@@ -63,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initViews() {
         btnToggle = findViewById(R.id.btnToggle)
+        btnTelegramConnect = findViewById(R.id.btnTelegramConnect)
         tvStatus = findViewById(R.id.tvStatus)
         switchTelegram = findViewById(R.id.switchTelegram)
         switchAutostart = findViewById(R.id.switchAutostart)
@@ -110,6 +112,11 @@ class MainActivity : AppCompatActivity() {
 
         switchTelegram.setOnCheckedChangeListener { _, checked ->
             prefs.edit().putBoolean("telegram_enabled", checked).apply()
+            updateStatusUi()
+        }
+
+        btnTelegramConnect.setOnClickListener {
+            openTelegramProxy()
         }
 
         switchAutostart.setOnCheckedChangeListener { _, checked ->
@@ -154,6 +161,20 @@ class MainActivity : AppCompatActivity() {
         )
         rvStrategies.alpha = if (running) 0.5f else 1.0f
         rvStrategies.isEnabled = !running
+        btnTelegramConnect.visibility = if (running && switchTelegram.isChecked)
+            android.view.View.VISIBLE else android.view.View.GONE
+    }
+
+    private fun openTelegramProxy() {
+        val deepLink = "tg://proxy?server=127.0.0.1&port=1443&secret="
+        try {
+            startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
+                android.net.Uri.parse(deepLink)))
+        } catch (_: Exception) {
+            // Telegram не установлен — открыть t.me ссылку в браузере
+            startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW,
+                android.net.Uri.parse("https://t.me/proxy?server=127.0.0.1&port=1443&secret=")))
+        }
     }
 
     override fun onResume() {

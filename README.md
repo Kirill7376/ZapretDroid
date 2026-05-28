@@ -14,7 +14,7 @@ Android-порт [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/z
 
 ## ⚙️ Использование
 
-1. Скачайте APK со [страницы последнего релиза](https://github.com/YOUR_USERNAME/ZapretDroid/releases/latest)
+1. Скачайте APK со [страницы последнего релиза](https://github.com/ezxidze/ZapretDroid/releases/latest)
 2. Разрешите установку из неизвестных источников и установите APK
 3. Откройте приложение → дайте разрешение на VPN
 4. Выберите стратегию из списка (начните с **General**)
@@ -74,7 +74,7 @@ Android-порт [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/z
 
 ### Обход перестал работать
 
-> Стратегии со временем могут переставать работать из-за обновления DPI на стороне провайдера. Если ни одна стратегия не помогает — создайте [issue](https://github.com/YOUR_USERNAME/ZapretDroid/issues).
+> Стратегии со временем могут переставать работать из-за обновления DPI на стороне провайдера. Если ни одна стратегия не помогает — создайте [issue](https://github.com/ezxidze/ZapretDroid/issues).
 
 - Попробуйте другие стратегии
 - Перезапустите приложение
@@ -87,7 +87,7 @@ Android-порт [Flowseal/zapret-discord-youtube](https://github.com/Flowseal/z
 
 ### Не нашли своей проблемы
 
-- Создайте её [тут](https://github.com/YOUR_USERNAME/ZapretDroid/issues)
+- Создайте её [тут](https://github.com/ezxidze/ZapretDroid/issues)
 
 ## 🗒️ Добавление своих доменов
 
