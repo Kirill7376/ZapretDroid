@@ -17,9 +17,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -31,8 +28,8 @@ jobs:
       - name: Build release APK (unsigned)
         run: ./gradlew assembleRelease
 
-      # -------- 3. Генерируем ключ и подписываем релиз --------
-      - name: Generate keystore and sign APK
+      # -------- 3. Генерируем ключ и подписываем через jarsigner --------
+      - name: Generate keystore and sign APK with jarsigner
         run: |
           # Создаём keystore (пароль 123456)
           keytool -genkey -v -keystore debug.keystore -alias zapret \
@@ -40,10 +37,10 @@ jobs:
             -storepass 123456 -keypass 123456 \
             -dname "CN=Zapret, OU=Dev, O=Zapret, L=City, S=State, C=RU"
 
-          # Подписываем APK (apksigner теперь доступен)
-          apksigner sign --ks debug.keystore --ks-pass pass:123456 \
-            --key-pass pass:123456 \
-            app/build/outputs/apk/release/*.apk
+          # Подписываем релизный APK (jarsigner всегда доступен)
+          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+            -keystore debug.keystore -storepass 123456 -keypass 123456 \
+            app/build/outputs/apk/release/*.apk zapret
 
       # -------- 4. Загружаем оба артефакта --------
       - name: Upload debug APK
