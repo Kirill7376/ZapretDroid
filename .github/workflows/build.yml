@@ -1,7 +1,7 @@
-name: Build APK
+name: Build APK (debug + signed release)
 
 on:
-  workflow_dispatch:  # позволяет запускать вручную
+  workflow_dispatch:  # ручной запуск
 
 jobs:
   build:
@@ -20,11 +20,37 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build release APK
+      # -------- 1. Собираем debug (уже подписан) --------
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      # -------- 2. Собираем release (пока без подписи) --------
+      - name: Build release APK (unsigned)
         run: ./gradlew assembleRelease
 
-      - name: Upload APK
+      # -------- 3. Подписываем release APK самодельным ключом --------
+      - name: Generate keystore and sign APK
+        run: |
+          # Генерируем keystore (пароли 123456)
+          keytool -genkey -v -keystore debug.keystore -alias zapret \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass 123456 -keypass 123456 \
+            -dname "CN=Zapret, OU=Dev, O=Zapret, L=City, S=State, C=RU"
+
+          # Подписываем релизный APK
+          apksigner sign --ks debug.keystore --ks-pass pass:123456 \
+            --key-pass pass:123456 \
+            app/build/outputs/apk/release/*.apk
+
+      # -------- 4. Загружаем оба артефакта --------
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: Upload signed release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-signed
           path: app/build/outputs/apk/release/*.apk
