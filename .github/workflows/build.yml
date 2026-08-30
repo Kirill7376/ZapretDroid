@@ -1,7 +1,7 @@
 name: Build APK (debug + signed release)
 
 on:
-  workflow_dispatch:  # ручной запуск
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,32 +12,35 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # -------- 1. Собираем debug (уже подписан) --------
+      # -------- 1. Debug (уже подписан) --------
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
-      # -------- 2. Собираем release (пока без подписи) --------
+      # -------- 2. Релиз (пока без подписи) --------
       - name: Build release APK (unsigned)
         run: ./gradlew assembleRelease
 
-      # -------- 3. Подписываем release APK самодельным ключом --------
+      # -------- 3. Генерируем ключ и подписываем релиз --------
       - name: Generate keystore and sign APK
         run: |
-          # Генерируем keystore (пароли 123456)
+          # Создаём keystore (пароль 123456)
           keytool -genkey -v -keystore debug.keystore -alias zapret \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -storepass 123456 -keypass 123456 \
             -dname "CN=Zapret, OU=Dev, O=Zapret, L=City, S=State, C=RU"
 
-          # Подписываем релизный APK
+          # Подписываем APK (apksigner теперь доступен)
           apksigner sign --ks debug.keystore --ks-pass pass:123456 \
             --key-pass pass:123456 \
             app/build/outputs/apk/release/*.apk
